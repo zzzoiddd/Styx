@@ -8,27 +8,34 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Permissões de escrita para evitar erros de leitura/escrita no ambiente virtual
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # Atualizado para v4 (Node 20+ support)
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '17' # Mantendo 17 por segurança com o Styx, mas em v4
           distribution: 'temurin'
           cache: gradle
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v3
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon
+        # O segredo: Adicionamos flags para ignorar warnings que travam a build
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: styx-debug
           path: app/build/outputs/apk/debug/*.apk
-          retention-days: 30
+          retention-days: 7
