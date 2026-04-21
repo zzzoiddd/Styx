@@ -22,8 +22,9 @@ jobs:
 
       - name: Fix line endings and permissions
         run: |
-          sed -i 's/
-$//' gradlew
+          printf '%s
+' "Fixing gradlew line endings..."
+          sed -i 's/\r$//' gradlew
           chmod +x gradlew
 
       - name: Build Debug APK
